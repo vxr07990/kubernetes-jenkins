@@ -11,33 +11,35 @@ while ! lxc info $container | grep -qE 'eth0:\sinet\s'; do
     sleep 3
 done
 
-PUSH integration-tests/install-deps.sh /root/
-RUN /root/install-deps.sh
+RUN sed -i "$ a export PATH=\$PATH:/snaps/bin/" /home/ubuntu/.bashrc
+PUSH integration-tests/install-deps.sh /home/ubuntu/
+RUN /home/ubuntu/install-deps.sh
 
-RUN mkdir -p /root/.local/share/juju
+RUN mkdir -p /home/ubuntu/.local/share/juju
 
-PUSH ~/.local/share/juju/accounts.yaml /root/.local/share/juju/
-PUSH ~/.local/share/juju/models.yaml /root/.local/share/juju/
-PUSH ~/.local/share/juju/controllers.yaml /root/.local/share/juju/
-PUSH ~/.local/share/juju/credentials.yaml /root/.local/share/juju/ 
+PUSH ~/.local/share/juju/accounts.yaml /home/ubuntu/.local/share/juju/
+PUSH ~/.local/share/juju/models.yaml /home/ubuntu/.local/share/juju/
+PUSH ~/.local/share/juju/controllers.yaml /home/ubuntu/.local/share/juju/
+PUSH ~/.local/share/juju/credentials.yaml /home/ubuntu/.local/share/juju/
 RUN mkdir -p /var/lib/jenkins/.local/share/juju
 PUSH ~/.local/share/juju/foo.json /var/lib/jenkins/.local/share/juju/
+RUN chown ubuntu:ubuntu -R /home/ubuntu/.local
 
 # Allow ssh access
-RUN mkdir -p /root/.ssh
-PUSH ~/.ssh/id_rsa.pub /root/.ssh/authorized_keys
-RUN chmod 600 /root/.ssh/authorized_keys
-RUN chown root:root /root/.ssh/authorized_keys
+RUN mkdir -p /home/ubuntu/.ssh
+PUSH ~/.ssh/id_rsa.pub /home/ubuntu/.ssh/authorized_keys
+RUN chmod 600 /home/ubuntu/.ssh/authorized_keys
+RUN chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
 
 # Jenkins agent needs java
 RUN apt-get install -y default-jre
 
-RUN mkdir -p /root/bin
+RUN mkdir -p /home/ubuntu/bin
 RUN wget https://ci.kubernetes.juju.solutions/jnlpJars/slave.jar
-RUN mv slave.jar /root/bin
+RUN mv slave.jar /home/ubuntu/bin
 
 echo "Your lxc container is ready to be added as jenkins node."
 echo "Go to Manage Jenkins -> Manage Nodes -> New Node and select"
 echo "Launch agent via execution of command on the master and enter the following:"
-echo "ssh -o StrictHostKeyChecking=no -v root@<container_ip> java -jar ~/bin/slave.jar"
+echo "ssh -o StrictHostKeyChecking=no -v ubuntu@<container_ip> java -jar ~/bin/slave.jar"
 lxc list
