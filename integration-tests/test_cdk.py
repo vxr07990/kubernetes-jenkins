@@ -23,7 +23,6 @@ async def test_deploy(bundle, log_dir):
         await deploy_e2e(model, charm_channel, snap_channel, namespace=namespace)
         await validate_all(model, log_dir)
 
-'''
 @pytest.mark.asyncio
 @pytest.mark.parametrize('bundle', bundles)
 async def test_upgrade(bundle, log_dir):
@@ -40,4 +39,3 @@ async def test_upgrade(bundle, log_dir):
 async def test_bundletester(log_dir):
     await run_bundletester(namespace, log_dir, channel=charm_channel,
                            snap_channel=snap_channel)
-'''
