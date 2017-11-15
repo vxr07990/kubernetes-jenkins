@@ -176,14 +176,18 @@ async def conjureup(model, namespace, bundle, channel='stable', snap_channel=Non
         cmd %= channel, namespace, bundle, os.path.join(tmpdirname, bundle)
         cmd = cmd.split()
         await asyncify(check_call)(cmd)
-        shutil.copytree(
-            os.path.join('/snap/conjure-up/current/spells', bundle),
-            os.path.join(tmpdirname, 'spell')
-        )
-        os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-01_get-kubectl'))
-        os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-01_get-kubectl.yaml'))
-        os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info'))
-        os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info.yaml'))
+        if os.path.isdir('/snap/conjure-up/current/spells'):
+            shutil.copytree(
+                os.path.join('/snap/conjure-up/current/spells', bundle),
+                os.path.join(tmpdirname, 'spell')
+            )
+            os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-01_get-kubectl'))
+            os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-01_get-kubectl.yaml'))
+            os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info'))
+            os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info.yaml'))
+        else:
+            # For bundles that do not have spells just create an empty spells directory
+            os.mkdir(os.path.join(tmpdirname, 'spell'))
         with open(os.path.join(tmpdirname, bundle, 'bundle.yaml')) as f:
             bundledata = yaml.load(f)
         appkey = 'services' if 'services' in bundledata else 'applications'
