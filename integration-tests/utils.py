@@ -176,7 +176,7 @@ async def conjureup(model, namespace, bundle, channel='stable', snap_channel=Non
         cmd %= channel, namespace, bundle, os.path.join(tmpdirname, bundle)
         cmd = cmd.split()
         await asyncify(check_call)(cmd)
-        if os.path.isdir('/snap/conjure-up/current/spells'):
+        if os.path.isdir(os.path.join('/snap/conjure-up/current/spells', bundle)):
             shutil.copytree(
                 os.path.join('/snap/conjure-up/current/spells', bundle),
                 os.path.join(tmpdirname, 'spell')
