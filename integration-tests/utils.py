@@ -186,8 +186,8 @@ async def conjureup(model, namespace, bundle, channel='stable', snap_channel=Non
             os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info'))
             os.remove(os.path.join(tmpdirname, 'spell', 'steps', 'step-02_cluster-info.yaml'))
         else:
-            # For bundles that do not have spells just create an empty spells directory
-            os.mkdir(os.path.join(tmpdirname, 'spell'))
+            # For bundles that do not have steps just report back
+            return False
         with open(os.path.join(tmpdirname, bundle, 'bundle.yaml')) as f:
             bundledata = yaml.load(f)
         appkey = 'services' if 'services' in bundledata else 'applications'
