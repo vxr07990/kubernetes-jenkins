@@ -21,9 +21,9 @@ if __name__ == '__main__':
         beta_snap = Microk8sSnap(track, 'beta')
         if beta_snap.released:
             # We already have a snap on beta. Let's see if we have to push a new release.
-            if beta_snap.version == edge_snap.version and always_release != 'no':
+            if beta_snap.version == edge_snap.version and always_release == 'no':
                 # Beta and edge are the same version. Nothing to release on this track.
-                print("Beta and edge have the same version {}. We will not release.")
+                print("Beta and edge have the same version {}. We will not release.".format(beta_snap.version))
                 continue
 
             print("Beta is at {}, edge at {}, and 'always_release' is {}.".format(

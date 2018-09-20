@@ -65,7 +65,7 @@ class Microk8sSnap:
         check_call(cmd)
         os.chdir("microk8s")
         if "under-testing" in self.under_testing_channel:
-            self.release(self.under_testing_channel)
+            self.release_to(self.under_testing_channel)
         for distro in distributions:
             cmd = "tests/test-distro.sh {} {} {}".format(distro, channel_to_upgrade, self.under_testing_channel).split()
             check_call(cmd)
