@@ -1,7 +1,11 @@
 #!/usr/bin/python3
 
+import os
 from snapstore import Microk8sSnap
 from configbag import tracks
+
+
+dry_run = os.environ.get('DRY_RUN', 'yes')
 
 
 if __name__ == '__main__':
@@ -23,5 +27,5 @@ if __name__ == '__main__':
             edge_snap.test_cross_distro(channel_to_upgrade='beta')
 
         # The following will raise exceptions in case of a failure
-        edge_snap.release_to('beta')
-        edge_snap.release_to('candidate')
+        edge_snap.release_to('beta', dry_run=dry_run)
+        edge_snap.release_to('candidate', dry_run=dry_run)

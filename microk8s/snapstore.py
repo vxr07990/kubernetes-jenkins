@@ -24,6 +24,9 @@ class Microk8sSnap:
 
             self.track = track
             self.channel = channel
+            self.under_testing_channel = channel
+            if "edge" in self.under_testing_channel:
+                self.under_testing_channel = "{}/under-testing".format(self.under_testing_channel)
             self.revision = revision_info[0]
             self.version = revision_info[3]
             self.release_date = parser.parse(revision_info[1])
@@ -31,7 +34,7 @@ class Microk8sSnap:
         else:
             self.released = False
 
-    def release_to(self, channel):
+    def release_to(self, channel, dry_run="no"):
         '''
         Release the Snap to the input channel
         Args:
@@ -39,11 +42,14 @@ class Microk8sSnap:
 
         '''
         target = channel if self.target == "latest" else "{}/{}".format(self.track, channel)
-        cmd = "snapcraft release microk8s {} {}".format(self.revision, target).split()
-        check_call(cmd)
+        cmd = "snapcraft release microk8s {} {}".format(self.revision, target)
+        if dry_run == "no":
+            check_call(cmd.split())
+        else:
+            print("DRY RUN - calling: {}".format(cmd))
 
     def test_cross_distro(self,  channel_to_upgrade='stable',
-                          distributions = ["ubuntu:16.04", "18:04"]):
+                          distributions = ["ubuntu:16.04", "ubuntu:18.04"]):
         '''
         Test the channel this snap came from and make sure we can upgrade the
         channel_to_upgrade. Tests are run on the distributions distros.
@@ -56,8 +62,8 @@ class Microk8sSnap:
         cmd = "git clone http://www.github.com/ubuntu/microk8s".split()
         check_call(cmd)
         os.chdir("microk8s")
-        # TODO: we should use the specific revision NOT just the channel of this snap
-        channel = self.channel if self.track == "latest" else "{}/{}".format(self.track, self.channel)
+        if "under-testing" in self.under_testing_channel:
+            self.release(self.under_testing_channel)
         for distro in distributions:
-            cmd = "tests/test-distro.sh {} {} {}".format(distro, channel_to_upgrade, channel).split()
+            cmd = "tests/test-distro.sh {} {} {}".format(distro, channel_to_upgrade, self.under_testing_channel).split()
             check_call(cmd)

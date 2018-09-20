@@ -1,8 +1,12 @@
 #!/usr/bin/python3
 
+import os
 from datetime import datetime
 from snapstore import Microk8sSnap
 from configbag import tracks
+
+
+dry_run = os.environ.get('DRY_RUN', 'yes')
 
 
 if __name__ == '__main__':
@@ -28,4 +32,4 @@ if __name__ == '__main__':
             candidate_snap.test_cross_distro(channel_to_upgrade='stable')
 
         # The following will raise an exception if it fails
-        candidate_snap.release_to('stable')
+        candidate_snap.release_to('stable', dry_run=dry_run)
