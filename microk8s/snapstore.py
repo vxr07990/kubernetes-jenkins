@@ -59,6 +59,8 @@ class Microk8sSnap:
             distributions: where to run tests on
 
         '''
+        cmd = "rm -rf microk8s".split()
+        check_call(cmd)
         cmd = "git clone http://www.github.com/ubuntu/microk8s".split()
         check_call(cmd)
         os.chdir("microk8s")
