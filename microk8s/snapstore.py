@@ -41,7 +41,7 @@ class Microk8sSnap:
             channel: The channel to release to
 
         '''
-        target = channel if self.target == "latest" else "{}/{}".format(self.track, channel)
+        target = channel if self.track == "latest" else "{}/{}".format(self.track, channel)
         cmd = "snapcraft release microk8s {} {}".format(self.revision, target)
         if dry_run == "no":
             check_call(cmd.split())
