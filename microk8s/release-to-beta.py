@@ -6,10 +6,11 @@ from configbag import tracks
 
 
 dry_run = os.environ.get('DRY_RUN', 'yes')
-
+always_release = os.environ.get('ALWAYS_RELEASE', 'no')
 
 if __name__ == '__main__':
-    print("Check edge for a new release cross-distro test and release to bet and candidate")
+    print("Check edge for a new release cross-distro test and release to beta and candidate.")
+    print("Dry run is set to '{}'.".format(dry_run))
     for track in tracks:
         print("Looking at track {}".format(track))
         edge_snap = Microk8sSnap(track, 'edge')
@@ -20,11 +21,17 @@ if __name__ == '__main__':
         beta_snap = Microk8sSnap(track, 'beta')
         if beta_snap.released:
             # We already have a snap on beta. Let's see if we have to push a new release.
-            if beta_snap.version == edge_snap.version:
+            if beta_snap.version == edge_snap.version and always_release != 'no':
                 # Beta and edge are the same version. Nothing to release on this track.
+                print("Beta and edge have the same version {}. We will not release.")
                 continue
 
+            print("Beta is at {}, edge at {}, and 'always_release' is {}.".format(
+                beta_snap.version, edge_snap.version, always_release
+            ))
             edge_snap.test_cross_distro(channel_to_upgrade='beta')
+        else:
+            print("Beta channel is empty. Releasing without any testing.")
 
         # The following will raise exceptions in case of a failure
         edge_snap.release_to('beta', dry_run=dry_run)
